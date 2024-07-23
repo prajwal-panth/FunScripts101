@@ -15,21 +15,37 @@ def delete_duplicate_files(dir_path):
     
     # Iterate through the files
     for file in files:
-        # Match files with a pattern: base name + (number) + extension
-        match = re.match(r'(.*)\s+\((\d+)\)\.(.*)', file)
-        if match:
-            base_name, _, extension = match.groups()
-            original_file = f"{base_name}.{extension}"
-            
-            # Check if the original file exists
-            if original_file in files:
-                # Delete the duplicate file
-                os.remove(os.path.join(dir_path, file))
-                print(f"Deleted duplicate file: {file}")
+        '''
+        Match files with a pattern:- 
+            {base name + (number) + extension} & {base name + " (Copy number)" + extension}
+        Eg: If Original = Screenshot, and Dublicates: Screenshot (2).png, Screenshot (3).png,
+          Screenshot (Copy 2).png, Screenshot (Copy 3).png
+        Then the program will delete Screenshot (2).png, Screenshot (3).png, Screenshot (Copy 2).png, 
+        and Screenshot (Copy 3).png
+        '''
+        match_number = re.match(r'(.*)\s+\((\d+)\)\.(.*)', file)
+        match_copy = re.match(r'(.*)\s+\(Copy (\d+)\)\.(.*)', file)
+
+        if match_number:
+            base_name, _, extension = match_number.groups()
+            original_file = f"{base_name.strip()}.{extension}"
+
+        elif match_copy:
+            base_name, _, extension = match_copy.groups()
+            original_file = f"{base_name.strip()}.{extension}"
+
+        else:
+            continue
+
+        # Check if the original file exists
+        if original_file in files:
+            # Delete the duplicate file
+            os.remove(os.path.join(dir_path, file))
+            print(f"Deleted duplicate file: {file}")
 
 if __name__ == "__main__":
     # Specify the directory to clean up
-    directory_to_clean = '/home/prajwal/Pictures/automation-main/File Managment/Files/Backup'
+    directory_to_clean = '/home/prajwal/Downloads/Test'#Give your path here
     
     # Run the function to delete duplicate files
     delete_duplicate_files(directory_to_clean)
